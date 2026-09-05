@@ -65,6 +65,29 @@ function Dashboard({ token }) {
     }
   };
 
+  const handleDuplicate = async (task) => {
+    const newTask = {
+      title: task.TITLE,
+      description: task.DESCRIPTION,
+      category: task.CATEGORY,
+      priority: task.PRIORITY,
+      status: 'Pending',
+      due_date: new Date().toISOString().split('T')[0],
+      school_district: task.SCHOOL_DISTRICT,
+      school_name: task.SCHOOL_NAME,
+      start_time: task.START_TIME,
+      stop_time: task.STOP_TIME,
+      start_time_2: task.START_TIME_2,
+      stop_time_2: task.STOP_TIME_2
+    };
+    try {
+      await axios.post(`${API_URL}/tasks`, newTask, authHeader);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const calculateLunchBreak = (stop1, start2) => {
     if (!stop1 || !start2) return null;
     try {
@@ -120,12 +143,18 @@ function Dashboard({ token }) {
               </div>
             </div>
             
-            <div className="task-actions">
-              <button onClick={() => handleStatusChange(task)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: task.STATUS === 'Completed' ? 'var(--secondary)' : 'var(--text-muted)' }}>
-                {task.STATUS === 'Completed' ? <CheckCircle /> : <Clock />}
+            <div className="task-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+              <button onClick={() => handleStatusChange(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: task.STATUS === 'Completed' ? 'var(--secondary)' : 'var(--text-muted)' }}>
+                {task.STATUS === 'Completed' ? <CheckCircle size={16} /> : <Clock size={16} />}
+                <span style={{ fontSize: '0.8rem' }}>{task.STATUS === 'Completed' ? 'Done' : 'Pending'}</span>
               </button>
-              <button onClick={() => handleDelete(task.TASK_ID)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)' }}>
-                <Trash2 />
+              <button onClick={() => handleDuplicate(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)' }}>
+                <PlusCircle size={16} />
+                <span style={{ fontSize: '0.8rem' }}>Add Copy</span>
+              </button>
+              <button onClick={() => handleDelete(task.TASK_ID)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)' }}>
+                <Trash2 size={16} />
+                <span style={{ fontSize: '0.8rem' }}>Delete</span>
               </button>
             </div>
           </div>
