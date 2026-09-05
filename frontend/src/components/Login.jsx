@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'http://192.168.1.143:5000/api/users';
 
 function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { PlusCircle, Search, Trash2, CheckCircle, Clock } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://192.168.1.143:5000/api';
 
 function Dashboard({ token }) {
   const [tasks, setTasks] = useState([]);
@@ -11,8 +11,8 @@ function Dashboard({ token }) {
   const [search, setSearch] = useState('');
   
   const [formData, setFormData] = useState({
-    title: '', description: '', category: 'Work', priority: 'Medium', status: 'Pending',
-    due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', lunch_break_minutes: ''
+    title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending',
+    due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: ''
   });
 
   const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -39,7 +39,7 @@ function Dashboard({ token }) {
     try {
       await axios.post(`${API_URL}/tasks`, formData, authHeader);
       setIsModalOpen(false);
-      setFormData({ title: '', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', lunch_break_minutes: '' });
+      setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '' });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -65,40 +65,35 @@ function Dashboard({ token }) {
     }
   };
 
+  const calculateLunchBreak = (stop1, start2) => {
+    if (!stop1 || !start2) return null;
+    try {
+      const [h1, m1] = stop1.split(':').map(Number);
+      const [h2, m2] = start2.split(':').map(Number);
+      let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+      return diff > 0 ? diff : 0;
+    } catch (e) {
+      return null;
+    }
+  };
+
   return (
     <div>
-      {/* Analytics Dashboard */}
-      <div className="dashboard-grid">
-        <div className="glass-container stat-card">
-          <h3>Total Tasks</h3>
-          <p>{stats.TOTAL_TASKS || 0}</p>
-        </div>
-        <div className="glass-container stat-card">
-          <h3>Completed</h3>
-          <p>{stats.COMPLETED_TASKS || 0}</p>
-        </div>
-        <div className="glass-container stat-card">
-          <h3>Pending</h3>
-          <p>{stats.PENDING_TASKS || 0}</p>
-        </div>
-        <div className="glass-container stat-card">
-          <h3>In Progress</h3>
-          <p>{stats.IN_PROGRESS_TASKS || 0}</p>
-        </div>
-      </div>
+
 
       {/* Task Controls */}
       <div className="task-controls">
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search style={{ position: 'absolute', left: '10px', top: '12px', color: 'var(--text-muted)' }} size={20} />
-          <input 
-            type="text" 
+        <div style={{ flex: 1 }}>
+          <select 
             className="glass-input" 
-            style={{ paddingLeft: '40px', marginBottom: 0 }} 
-            placeholder="Search tasks..." 
+            style={{ marginBottom: 0 }} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-          />
+          >
+            <option value="">All Districts</option>
+            <option value="CVUSD">CVUSD</option>
+            <option value="SLZUSD">SLZUSD</option>
+          </select>
         </div>
         <button className="glass-button" style={{ width: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => setIsModalOpen(true)}>
           <PlusCircle size={20} /> Add Task
@@ -112,18 +107,16 @@ function Dashboard({ token }) {
             <div style={{ flex: 1 }}>
               <div className="task-header">
                 <h3 style={{ textDecoration: task.STATUS === 'Completed' ? 'line-through' : 'none' }}>{task.TITLE}</h3>
-                <span className={`task-badge ${task.PRIORITY === 'High' ? 'badge-high' : task.PRIORITY === 'Medium' ? 'badge-medium' : 'badge-low'}`}>
-                  {task.PRIORITY}
-                </span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{task.DESCRIPTION}</p>
               
               <div className="task-details">
                 {task.SCHOOL_DISTRICT && <span><strong>District:</strong> {task.SCHOOL_DISTRICT}</span>}
                 {task.SCHOOL_NAME && <span><strong>School:</strong> {task.SCHOOL_NAME}</span>}
-                {task.START_TIME && <span><strong>Hours:</strong> {task.START_TIME} - {task.STOP_TIME}</span>}
-                {task.LUNCH_BREAK_MINUTES && <span><strong>Lunch:</strong> {task.LUNCH_BREAK_MINUTES} mins</span>}
-                {task.DUE_DATE && <span><strong>Due:</strong> {new Date(task.DUE_DATE).toLocaleDateString()}</span>}
+                {task.START_TIME && <span><strong>Morning Shift:</strong> {task.START_TIME} - {task.STOP_TIME}</span>}
+                {task.START_TIME_2 && <span><strong>Afternoon Shift:</strong> {task.START_TIME_2} - {task.STOP_TIME_2}</span>}
+                {task.STOP_TIME && task.START_TIME_2 && <span><strong>Lunch Break:</strong> {calculateLunchBreak(task.STOP_TIME, task.START_TIME_2)} mins</span>}
+                {task.DUE_DATE && <span><strong>Date:</strong> {new Date(task.DUE_DATE).toLocaleDateString()}</span>}
               </div>
             </div>
             
@@ -149,26 +142,12 @@ function Dashboard({ token }) {
               
               <div style={{ gridColumn: 'span 2' }}>
                 <label>Title *</label>
-                <input type="text" className="glass-input" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                <input type="text" className="glass-input" required readOnly value={formData.title} style={{ backgroundColor: 'rgba(255,255,255,0.3)', cursor: 'not-allowed' }} />
               </div>
               
               <div style={{ gridColumn: 'span 2' }}>
                 <label>Description</label>
                 <input type="text" className="glass-input" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-              </div>
-
-              <div>
-                <label>Category</label>
-                <select className="glass-input" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                  <option>Work</option><option>Personal</option><option>Learning</option><option>Meetings</option>
-                </select>
-              </div>
-
-              <div>
-                <label>Priority</label>
-                <select className="glass-input" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
-                  <option>Low</option><option>Medium</option><option>High</option>
-                </select>
               </div>
 
               <div style={{ gridColumn: 'span 2' }}>
@@ -178,7 +157,11 @@ function Dashboard({ token }) {
 
               <div>
                 <label>School District</label>
-                <input type="text" className="glass-input" value={formData.school_district} onChange={e => setFormData({...formData, school_district: e.target.value})} />
+                <select className="glass-input" value={formData.school_district} onChange={e => setFormData({...formData, school_district: e.target.value})}>
+                  <option value="">Select District</option>
+                  <option value="SLZUSD">SLZUSD</option>
+                  <option value="CVUSD">CVUSD</option>
+                </select>
               </div>
               
               <div>
@@ -187,22 +170,27 @@ function Dashboard({ token }) {
               </div>
 
               <div>
-                <label>Start Time (HH:MM)</label>
+                <label>Morning Start Time</label>
                 <input type="time" className="glass-input" value={formData.start_time} onChange={e => setFormData({...formData, start_time: e.target.value})} />
               </div>
               
               <div>
-                <label>Stop Time (HH:MM)</label>
+                <label>Morning Stop Time</label>
                 <input type="time" className="glass-input" value={formData.stop_time} onChange={e => setFormData({...formData, stop_time: e.target.value})} />
               </div>
 
               <div>
-                <label>Lunch Break (minutes)</label>
-                <input type="number" className="glass-input" value={formData.lunch_break_minutes} onChange={e => setFormData({...formData, lunch_break_minutes: e.target.value})} />
+                <label>Afternoon Start Time</label>
+                <input type="time" className="glass-input" value={formData.start_time_2} onChange={e => setFormData({...formData, start_time_2: e.target.value})} />
+              </div>
+              
+              <div>
+                <label>Afternoon Stop Time</label>
+                <input type="time" className="glass-input" value={formData.stop_time_2} onChange={e => setFormData({...formData, stop_time_2: e.target.value})} />
               </div>
 
               <div>
-                <label>Due Date</label>
+                <label>Date</label>
                 <input type="date" className="glass-input" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})} />
               </div>
 

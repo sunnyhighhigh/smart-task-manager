@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getConnection } = require('./db');
 const oracledb = require('oracledb');
+oracledb.fetchAsString = [oracledb.CLOB];
 require('dotenv').config();
 
 const app = express();
@@ -106,7 +107,7 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
     try {
         const { 
             title, description, category, priority, status, due_date, 
-            school_district, school_name, start_time, stop_time, lunch_break_minutes 
+            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2 
         } = req.body;
         
         connection = await getConnection();
@@ -114,10 +115,10 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
         const result = await connection.execute(
             `INSERT INTO TASKS (
                 user_id, title, description, category, priority, status, due_date, 
-                school_district, school_name, start_time, stop_time, lunch_break_minutes
+                school_district, school_name, start_time, stop_time, start_time_2, stop_time_2
             ) VALUES (
                 :user_id, :title, :description, :category, :priority, :status, TO_DATE(:due_date, 'YYYY-MM-DD'), 
-                :school_district, :school_name, :start_time, :stop_time, :lunch_break_minutes
+                :school_district, :school_name, :start_time, :stop_time, :start_time_2, :stop_time_2
             ) RETURNING task_id INTO :task_id`,
             {
                 user_id: req.user.user_id,
@@ -131,7 +132,8 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
                 school_name: school_name || null,
                 start_time: start_time || null,
                 stop_time: stop_time || null,
-                lunch_break_minutes: lunch_break_minutes || null,
+                start_time_2: start_time_2 || null,
+                stop_time_2: stop_time_2 || null,
                 task_id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
             }
         );
@@ -158,8 +160,8 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
         let params = { user_id: req.user.user_id };
         
         if (search) {
-            query += ` AND title LIKE :search`;
-            params.search = `%${search}%`;
+            query += ` AND school_district = :search`;
+            params.search = search;
         }
         if (category) {
             query += ` AND category = :category`;
@@ -194,7 +196,7 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
     try {
         const { 
             title, description, category, priority, status, due_date, 
-            school_district, school_name, start_time, stop_time, lunch_break_minutes 
+            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2 
         } = req.body;
         
         connection = await getConnection();
@@ -211,7 +213,8 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
                 school_name = COALESCE(:school_name, school_name),
                 start_time = COALESCE(:start_time, start_time),
                 stop_time = COALESCE(:stop_time, stop_time),
-                lunch_break_minutes = COALESCE(:lunch_break_minutes, lunch_break_minutes)
+                start_time_2 = COALESCE(:start_time_2, start_time_2),
+                stop_time_2 = COALESCE(:stop_time_2, stop_time_2)
             WHERE task_id = :task_id AND user_id = :user_id`,
             {
                 title: title || null,
@@ -224,7 +227,8 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
                 school_name: school_name || null,
                 start_time: start_time || null,
                 stop_time: stop_time || null,
-                lunch_break_minutes: lunch_break_minutes || null,
+                start_time_2: start_time_2 || null,
+                stop_time_2: stop_time_2 || null,
                 task_id: req.params.id,
                 user_id: req.user.user_id
             }
