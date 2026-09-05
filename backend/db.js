@@ -14,6 +14,7 @@ async function getConnection() {
         };
         
         if (process.env.WALLET_PASSWORD) {
+            process.env.TNS_ADMIN = './wallet';
             connectionParams.walletLocation = './wallet';
             connectionParams.walletPassword = process.env.WALLET_PASSWORD;
         }
