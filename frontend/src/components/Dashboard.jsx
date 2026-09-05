@@ -80,29 +80,6 @@ function Dashboard({ token }) {
     setIsModalOpen(true);
   };
 
-  const handleDuplicate = async (task) => {
-    const newTask = {
-      title: task.TITLE,
-      description: task.DESCRIPTION,
-      category: task.CATEGORY,
-      priority: task.PRIORITY,
-      status: 'Pending',
-      due_date: new Date().toISOString().split('T')[0],
-      school_district: task.SCHOOL_DISTRICT,
-      school_name: task.SCHOOL_NAME,
-      start_time: task.START_TIME,
-      stop_time: task.STOP_TIME,
-      start_time_2: task.START_TIME_2,
-      stop_time_2: task.STOP_TIME_2
-    };
-    try {
-      await axios.post(`${API_URL}/tasks`, newTask, authHeader);
-      fetchData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const calculateLunchBreak = (stop1, start2) => {
     if (!stop1 || !start2) return null;
     try {
@@ -166,10 +143,6 @@ function Dashboard({ token }) {
               <button onClick={() => handleEdit(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                 <Edit2 size={16} />
                 <span style={{ fontSize: '0.8rem' }}>Edit</span>
-              </button>
-              <button onClick={() => handleDuplicate(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)' }}>
-                <PlusCircle size={16} />
-                <span style={{ fontSize: '0.8rem' }}>Add Copy</span>
               </button>
               <button onClick={() => handleDelete(task.TASK_ID)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)' }}>
                 <Trash2 size={16} />
