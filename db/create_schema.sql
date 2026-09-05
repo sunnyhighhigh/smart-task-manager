@@ -239,6 +239,11 @@ jobs:
     - name: Build Frontend Application
       working-directory: ./frontend
       run: npm run build
+1. on: push: Every time you push code to the main or dev branch, this automated pipeline wakes up.
+2. runs-on: ubuntu-latest: It spins up a fresh, clean cloud server running Linux Ubuntu.
+3. actions/setup-node@v3: It installs Node.js version 20 automatically onto the server.
+4. npm install: It downloads all of the dependencies needed for both your Express backend and your React frontend.
+5. npm test & npm run build: It automatically runs your Jest unit/API tests and compiles the React application to ensure there are no bugs or build errors before the code is finalized!
 
 
 
@@ -269,5 +274,28 @@ jobs:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11.4 CD — Deployment Stage (optional, bonus)
+
+
+
+
+
+Secrets Page
 
 

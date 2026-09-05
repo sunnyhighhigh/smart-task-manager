@@ -41,8 +41,10 @@ A full-stack task management application tailored for tracking daily paraprofess
 3. Start the Vite development server: `npm run dev`
 
 ## 🔄 CI/CD & Branching Strategy
-- **Branching:** Use `main` for stable releases and `dev` for integration. Feature branches (`feature/*`) should be merged via Pull Requests.
-- **Pipeline (`.github/workflows/ci.yml`):** Automatically triggers on pushes and PRs. It checks out the code, installs dependencies for both frontend and backend, runs ESLint (if configured), and executes the Jest API tests to ensure no breaking changes are merged.
+- **Branching Strategy:** The project utilizes a strict branching model where `main` is protected as the production-ready code. Active development occurs on `dev` or `feature/*` branches, which are merged via Pull Requests.
+- **Pipeline Stages (`.github/workflows/ci.yml`):** 
+  1. **Continuous Integration (CI):** The `build-and-test` stage automatically triggers on all pushes. It provisions a Node.js 20.x cloud server, installs dependencies, and executes Jest API unit tests to prevent broken code from being merged.
+  2. **Continuous Deployment (CD):** Once the CI stage passes, the `deploy` stage activates exclusively on the `main` branch, securely pulling Oracle Database credentials from GitHub Secrets to automate the production release.
 
 ## 🤖 AI Prompt Engineering Log
 *(To be filled by student for assignment submission)*
