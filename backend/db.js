@@ -14,8 +14,11 @@ async function getConnection() {
         };
         
         if (process.env.WALLET_PASSWORD) {
-            process.env.TNS_ADMIN = './wallet';
-            connectionParams.walletLocation = './wallet';
+            const path = require('path');
+            const walletPath = path.join(__dirname, 'wallet');
+            process.env.TNS_ADMIN = walletPath;
+            oracledb.configDir = walletPath;
+            connectionParams.walletLocation = walletPath;
             connectionParams.walletPassword = process.env.WALLET_PASSWORD;
         }
 
