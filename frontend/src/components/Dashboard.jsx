@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { PlusCircle, Search, Trash2, CheckCircle, Clock } from 'lucide-react';
+import { PlusCircle, Search, Trash2, Edit2 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -8,6 +8,7 @@ function Dashboard({ token }) {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [search, setSearch] = useState('');
   
   const [formData, setFormData] = useState({
@@ -37,8 +38,13 @@ function Dashboard({ token }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/tasks`, formData, authHeader);
+      if (editingTaskId) {
+        await axios.put(`${API_URL}/tasks/${editingTaskId}`, formData, authHeader);
+      } else {
+        await axios.post(`${API_URL}/tasks`, formData, authHeader);
+      }
       setIsModalOpen(false);
+      setEditingTaskId(null);
       setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '' });
       fetchData();
     } catch (err) {
@@ -55,14 +61,23 @@ function Dashboard({ token }) {
     }
   };
 
-  const handleStatusChange = async (task) => {
-    const newStatus = task.STATUS === 'Completed' ? 'Pending' : 'Completed';
-    try {
-      await axios.put(`${API_URL}/tasks/${task.TASK_ID}`, { status: newStatus }, authHeader);
-      fetchData();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleEdit = (task) => {
+    setEditingTaskId(task.TASK_ID);
+    setFormData({
+      title: task.TITLE || '',
+      description: task.DESCRIPTION || '',
+      category: task.CATEGORY || '',
+      priority: task.PRIORITY || '',
+      status: task.STATUS || 'Pending',
+      due_date: task.DUE_DATE ? new Date(task.DUE_DATE).toISOString().split('T')[0] : '',
+      school_district: task.SCHOOL_DISTRICT || '',
+      school_name: task.SCHOOL_NAME || '',
+      start_time: task.START_TIME || '',
+      stop_time: task.STOP_TIME || '',
+      start_time_2: task.START_TIME_2 || '',
+      stop_time_2: task.STOP_TIME_2 || ''
+    });
+    setIsModalOpen(true);
   };
 
   const handleDuplicate = async (task) => {
@@ -118,7 +133,11 @@ function Dashboard({ token }) {
             <option value="SLZUSD">SLZUSD</option>
           </select>
         </div>
-        <button className="glass-button" style={{ width: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => setIsModalOpen(true)}>
+        <button className="glass-button" style={{ width: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => {
+          setEditingTaskId(null);
+          setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '' });
+          setIsModalOpen(true);
+        }}>
           <PlusCircle size={20} /> Add Task
         </button>
       </div>
@@ -129,7 +148,7 @@ function Dashboard({ token }) {
           <div key={task.TASK_ID} className="glass-container task-item">
             <div style={{ flex: 1 }}>
               <div className="task-header">
-                <h3 style={{ textDecoration: task.STATUS === 'Completed' ? 'line-through' : 'none' }}>{task.TITLE}</h3>
+                <h3>{task.TITLE}</h3>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{task.DESCRIPTION}</p>
               
@@ -144,9 +163,9 @@ function Dashboard({ token }) {
             </div>
             
             <div className="task-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
-              <button onClick={() => handleStatusChange(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: task.STATUS === 'Completed' ? 'var(--secondary)' : 'var(--text-muted)' }}>
-                {task.STATUS === 'Completed' ? <CheckCircle size={16} /> : <Clock size={16} />}
-                <span style={{ fontSize: '0.8rem' }}>{task.STATUS === 'Completed' ? 'Done' : 'Pending'}</span>
+              <button onClick={() => handleEdit(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                <Edit2 size={16} />
+                <span style={{ fontSize: '0.8rem' }}>Edit</span>
               </button>
               <button onClick={() => handleDuplicate(task)} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)' }}>
                 <PlusCircle size={16} />
@@ -166,7 +185,7 @@ function Dashboard({ token }) {
       {isModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 50, padding: '1rem' }}>
           <div className="glass-container" style={{ width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', background: 'white' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Create Paraprofessional Task</h2>
+            <h2 style={{ marginBottom: '1.5rem' }}>{editingTaskId ? "Edit Task" : "Create Paraprofessional Task"}</h2>
             <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               
               <div style={{ gridColumn: 'span 2' }}>
@@ -224,7 +243,7 @@ function Dashboard({ token }) {
               </div>
 
               <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button type="button" className="glass-button secondary" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="button" className="glass-button secondary" onClick={() => { setIsModalOpen(false); setEditingTaskId(null); }}>Cancel</button>
                 <button type="submit" className="glass-button">Save Task</button>
               </div>
             </form>
