@@ -7,11 +7,18 @@ oracledb.autoCommit = true;
 
 async function getConnection() {
     try {
-        const connection = await oracledb.getConnection({
+        const connectionParams = {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             connectString: process.env.DB_CONNECTION_STRING
-        });
+        };
+        
+        if (process.env.WALLET_PASSWORD) {
+            connectionParams.walletLocation = './wallet';
+            connectionParams.walletPassword = process.env.WALLET_PASSWORD;
+        }
+
+        const connection = await oracledb.getConnection(connectionParams);
         return connection;
     } catch (err) {
         console.error('Failed to connect to Oracle DB:', err);
