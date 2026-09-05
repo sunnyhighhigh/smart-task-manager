@@ -181,6 +181,28 @@ Entity -Relationship diagram
 * Actively found and fixed a major configuration bug in the CI/CD pipeline where the Node 18 matrix was failing to cache correctly. Debugged it, simplified the workflow to Node 20.x, and successfully fixed the pipeline.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 10) Security Requirements
 
 1. Input validation & Error handling:
@@ -193,80 +215,6 @@ Entity -Relationship diagram
 * used JSON Web Tokens (JWT). When a user logs in, they get a secure token. When they try to load their tasks, the server checks that token to ensure they can only see their own tasks and not the tasks of other paraprofessionals.
 5. No secrets or DB credentials committed to Git:
 *  literally accomplished this earlier today!  when git add . crashed, created the .gitignore file.  specifically told Git to ignore your backend/.env file. My Oracle username and password were never uploaded to GitHub, keeping your database completely secure.
-* 
-11) Git, GitHub &amp; CI/CD Pipeline Requirements
-
-1. Git: You used Git locally to track your files, create a .gitignore file, and commit the code (git commit -m "Initial capstone commit").
-2. GitHub: You uploaded your local Git repository to a remote repository hosted on GitHub.com (git push origin main).
-3. GitHub Actions (CI/CD): We wrote the .github/workflows/ci.yml script. Every single time you push new code to your GitHub repository, GitHub Actions automatically spins up a cloud server, downloads your code, installs the dependencies for the frontend and backend, and runs the automated tests.
-That green checkmark  on the GitHub Actions tab is the absolute proof that your automated CI/CD pipeline is working flawlessly!
-
-
-
-11.3) Example GitHub Actions Workflow (Node.js backend)
-
-name: Smart Task Manager CI/CD
-
-on:
-  push:
-    branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20.x
-        
-    - name: Install Backend Dependencies
-      working-directory: ./backend
-      run: npm install
-      
-    - name: Install Frontend Dependencies
-      working-directory: ./frontend
-      run: npm install
-      
-    - name: Run Backend Tests
-      working-directory: ./backend
-      run: npm test
-      
-    - name: Build Frontend Application
-      working-directory: ./frontend
-      run: npm run build
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
