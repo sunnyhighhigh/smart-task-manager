@@ -13,7 +13,7 @@ function Dashboard({ token }) {
   
   const [formData, setFormData] = useState({
     title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending',
-    due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: ''
+    due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '', substitute_name: ''
   });
 
   const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -45,7 +45,7 @@ function Dashboard({ token }) {
       }
       setIsModalOpen(false);
       setEditingTaskId(null);
-      setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '' });
+      setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '', substitute_name: '' });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -75,7 +75,8 @@ function Dashboard({ token }) {
       start_time: task.START_TIME || '',
       stop_time: task.STOP_TIME || '',
       start_time_2: task.START_TIME_2 || '',
-      stop_time_2: task.STOP_TIME_2 || ''
+      stop_time_2: task.STOP_TIME_2 || '',
+      substitute_name: task.SUBSTITUTE_NAME || ''
     });
     setIsModalOpen(true);
   };
@@ -112,7 +113,7 @@ function Dashboard({ token }) {
         </div>
         <button className="glass-button" style={{ width: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => {
           setEditingTaskId(null);
-          setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '' });
+          setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '', substitute_name: '' });
           setIsModalOpen(true);
         }}>
           <PlusCircle size={20} /> Add Task
@@ -132,6 +133,7 @@ function Dashboard({ token }) {
               <div className="task-details">
                 {task.SCHOOL_DISTRICT && <span><strong>District:</strong> {task.SCHOOL_DISTRICT}</span>}
                 {task.SCHOOL_NAME && <span><strong>School:</strong> {task.SCHOOL_NAME}</span>}
+                {task.SUBSTITUTE_NAME && <span><strong>Substitute:</strong> {task.SUBSTITUTE_NAME}</span>}
                 {task.START_TIME && <span><strong>Morning Shift:</strong> {task.START_TIME} - {task.STOP_TIME}</span>}
                 {task.START_TIME_2 && <span><strong>Afternoon Shift:</strong> {task.START_TIME_2} - {task.STOP_TIME_2}</span>}
                 {task.STOP_TIME && task.START_TIME_2 && <span><strong>Lunch Break:</strong> {calculateLunchBreak(task.STOP_TIME, task.START_TIME_2)} mins</span>}
@@ -188,6 +190,11 @@ function Dashboard({ token }) {
               <div>
                 <label>School Name</label>
                 <input type="text" className="glass-input" value={formData.school_name} onChange={e => setFormData({...formData, school_name: e.target.value})} />
+              </div>
+              
+              <div style={{ gridColumn: 'span 2' }}>
+                <label>Substitute's Name</label>
+                <input type="text" className="glass-input" placeholder="e.g. John Doe" value={formData.substitute_name} onChange={e => setFormData({...formData, substitute_name: e.target.value})} />
               </div>
 
               <div>

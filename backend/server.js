@@ -107,7 +107,7 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
     try {
         const { 
             title, description, category, priority, status, due_date, 
-            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2 
+            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2, substitute_name
         } = req.body;
         
         connection = await getConnection();
@@ -115,10 +115,10 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
         const result = await connection.execute(
             `INSERT INTO TASKS (
                 user_id, title, description, category, priority, status, due_date, 
-                school_district, school_name, start_time, stop_time, start_time_2, stop_time_2
+                school_district, school_name, start_time, stop_time, start_time_2, stop_time_2, substitute_name
             ) VALUES (
                 :user_id, :title, :description, :category, :priority, :status, TO_DATE(:due_date, 'YYYY-MM-DD'), 
-                :school_district, :school_name, :start_time, :stop_time, :start_time_2, :stop_time_2
+                :school_district, :school_name, :start_time, :stop_time, :start_time_2, :stop_time_2, :substitute_name
             ) RETURNING task_id INTO :task_id`,
             {
                 user_id: req.user.user_id,
@@ -134,6 +134,7 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
                 stop_time: stop_time || null,
                 start_time_2: start_time_2 || null,
                 stop_time_2: stop_time_2 || null,
+                substitute_name: substitute_name || null,
                 task_id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
             }
         );
@@ -196,7 +197,7 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
     try {
         const { 
             title, description, category, priority, status, due_date, 
-            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2 
+            school_district, school_name, start_time, stop_time, start_time_2, stop_time_2, substitute_name
         } = req.body;
         
         connection = await getConnection();
@@ -214,7 +215,8 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
                 start_time = :start_time,
                 stop_time = :stop_time,
                 start_time_2 = :start_time_2,
-                stop_time_2 = :stop_time_2
+                stop_time_2 = :stop_time_2,
+                substitute_name = :substitute_name
             WHERE task_id = :task_id AND user_id = :user_id`,
             {
                 title: title,
@@ -229,6 +231,7 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
                 stop_time: stop_time || null,
                 start_time_2: start_time_2 || null,
                 stop_time_2: stop_time_2 || null,
+                substitute_name: substitute_name || null,
                 task_id: req.params.id,
                 user_id: req.user.user_id
             }
