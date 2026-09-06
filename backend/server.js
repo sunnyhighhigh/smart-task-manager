@@ -203,21 +203,21 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
         
         const result = await connection.execute(
             `UPDATE TASKS SET 
-                title = COALESCE(:title, title),
-                description = COALESCE(:description, description),
-                category = COALESCE(:category, category),
-                priority = COALESCE(:priority, priority),
-                status = COALESCE(:status, status),
-                due_date = COALESCE(TO_DATE(:due_date, 'YYYY-MM-DD'), due_date),
-                school_district = COALESCE(:school_district, school_district),
-                school_name = COALESCE(:school_name, school_name),
-                start_time = COALESCE(:start_time, start_time),
-                stop_time = COALESCE(:stop_time, stop_time),
-                start_time_2 = COALESCE(:start_time_2, start_time_2),
-                stop_time_2 = COALESCE(:stop_time_2, stop_time_2)
+                title = :title,
+                description = :description,
+                category = :category,
+                priority = :priority,
+                status = :status,
+                due_date = TO_DATE(:due_date, 'YYYY-MM-DD'),
+                school_district = :school_district,
+                school_name = :school_name,
+                start_time = :start_time,
+                stop_time = :stop_time,
+                start_time_2 = :start_time_2,
+                stop_time_2 = :stop_time_2
             WHERE task_id = :task_id AND user_id = :user_id`,
             {
-                title: title || null,
+                title: title,
                 description: description || null,
                 category: category || null,
                 priority: priority || null,
