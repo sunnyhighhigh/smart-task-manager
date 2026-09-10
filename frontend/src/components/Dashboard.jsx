@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { PlusCircle, Search, Trash2, Edit2 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5000/api`;
 
 function Dashboard({ token }) {
   const [tasks, setTasks] = useState([]);
@@ -81,13 +81,23 @@ function Dashboard({ token }) {
     setIsModalOpen(true);
   };
 
-  const calculateLunchBreak = (stop1, start2) => {
-    if (!stop1 || !start2) return null;
+  const calculateTotalHours = (start1, stop1, start2, stop2) => {
+    let totalMinutes = 0;
     try {
-      const [h1, m1] = stop1.split(':').map(Number);
-      const [h2, m2] = start2.split(':').map(Number);
-      let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-      return diff > 0 ? diff : 0;
+      if (start1 && stop1) {
+        const [h1, m1] = start1.split(':').map(Number);
+        const [h2, m2] = stop1.split(':').map(Number);
+        totalMinutes += (h2 * 60 + m2) - (h1 * 60 + m1);
+      }
+      if (start2 && stop2) {
+        const [h3, m3] = start2.split(':').map(Number);
+        const [h4, m4] = stop2.split(':').map(Number);
+        totalMinutes += (h4 * 60 + m4) - (h3 * 60 + m3);
+      }
+      if (totalMinutes <= 0) return null;
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      return `${hours}h ${mins > 0 ? mins + 'm' : ''}`.trim();
     } catch (e) {
       return null;
     }
@@ -125,19 +135,14 @@ function Dashboard({ token }) {
         {tasks.map(task => (
           <div key={task.TASK_ID} className="glass-container task-item">
             <div style={{ flex: 1 }}>
-              <div className="task-header">
-                <h3>{task.TITLE}</h3>
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{task.DESCRIPTION}</p>
-              
-              <div className="task-details">
+              <div className="task-details" style={{ marginTop: '0.5rem' }}>
+                {task.DUE_DATE && <span><strong>Date:</strong> {new Date(task.DUE_DATE).toLocaleDateString()}</span>}
                 {task.SCHOOL_DISTRICT && <span><strong>District:</strong> {task.SCHOOL_DISTRICT}</span>}
                 {task.SCHOOL_NAME && <span><strong>School:</strong> {task.SCHOOL_NAME}</span>}
                 {task.SUBSTITUTE_NAME && <span><strong>Substitute:</strong> {task.SUBSTITUTE_NAME}</span>}
                 {task.START_TIME && <span><strong>Morning Shift:</strong> {task.START_TIME} - {task.STOP_TIME}</span>}
                 {task.START_TIME_2 && <span><strong>Afternoon Shift:</strong> {task.START_TIME_2} - {task.STOP_TIME_2}</span>}
-                {task.STOP_TIME && task.START_TIME_2 && <span><strong>Lunch Break:</strong> {calculateLunchBreak(task.STOP_TIME, task.START_TIME_2)} mins</span>}
-                {task.DUE_DATE && <span><strong>Date:</strong> {new Date(task.DUE_DATE).toLocaleDateString()}</span>}
+                {(task.START_TIME || task.START_TIME_2) && <span><strong>Total Hours Worked:</strong> {calculateTotalHours(task.START_TIME, task.STOP_TIME, task.START_TIME_2, task.STOP_TIME_2) || '0h'}</span>}
               </div>
             </div>
             
@@ -164,18 +169,8 @@ function Dashboard({ token }) {
             <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               
               <div style={{ gridColumn: 'span 2' }}>
-                <label>Title *</label>
-                <input type="text" className="glass-input" required readOnly value={formData.title} style={{ backgroundColor: 'rgba(255,255,255,0.3)', cursor: 'not-allowed' }} />
-              </div>
-              
-              <div style={{ gridColumn: 'span 2' }}>
-                <label>Description</label>
-                <input type="text" className="glass-input" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                <hr style={{ margin: '1rem 0', borderColor: '#eee' }}/>
-                <h4>Paraprofessional Details</h4>
+                <label>Date</label>
+                <input type="date" className="glass-input" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})} />
               </div>
 
               <div>
@@ -215,11 +210,6 @@ function Dashboard({ token }) {
               <div>
                 <label>Afternoon Stop Time</label>
                 <input type="time" className="glass-input" value={formData.stop_time_2} onChange={e => setFormData({...formData, stop_time_2: e.target.value})} />
-              </div>
-
-              <div>
-                <label>Date</label>
-                <input type="date" className="glass-input" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})} />
               </div>
 
               <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>

@@ -50,6 +50,7 @@ CREATE TABLE TASKS (
     stop_time VARCHAR2(10),        -- Morning Shift Stop (HH:MM)
     start_time_2 VARCHAR2(10),     -- Afternoon Shift Start (HH:MM)
     stop_time_2 VARCHAR2(10),      -- Afternoon Shift Stop (HH:MM)
+    substitute_name VARCHAR2(255), -- Substitute Teacher Name
     
     created_date TIMESTAMP DEFAULT SYSTIMESTAMP,
     

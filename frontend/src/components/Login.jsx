@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/users` : 'http://localhost:5000/api/users';
+const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/users` : `http://${window.location.hostname}:5000/api/users`;
 
 function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);

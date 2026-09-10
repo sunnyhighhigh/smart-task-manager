@@ -26,7 +26,7 @@ function App() {
       <div className="app-layout">
         {token && (
           <header className="header">
-            <h2>Smart Task Manager</h2>
+            <h2>Smart Task Manager V2</h2>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <span>Welcome, {userName}</span>
               <button className="glass-button secondary" style={{ width: 'auto', padding: '0.5rem 1rem' }} onClick={handleLogout}>

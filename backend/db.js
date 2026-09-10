@@ -3,6 +3,7 @@ require('dotenv').config();
 
 // Ensure output is formatted as JSON objects instead of arrays
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.fetchAsString = [oracledb.CLOB];
 oracledb.autoCommit = true;
 
 async function getConnection() {
