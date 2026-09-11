@@ -136,7 +136,7 @@ function Dashboard({ token }) {
           <div key={task.TASK_ID} className="glass-container task-item">
             <div style={{ flex: 1 }}>
               <div className="task-details" style={{ marginTop: '0.5rem' }}>
-                {task.DUE_DATE && <span><strong>Date:</strong> {new Date(task.DUE_DATE).toLocaleDateString()}</span>}
+                {task.DUE_DATE && <span><strong>Date:</strong> {new Date(task.DUE_DATE).toLocaleDateString('en-US', { timeZone: 'UTC' })}</span>}
                 {task.SCHOOL_DISTRICT && <span><strong>District:</strong> {task.SCHOOL_DISTRICT}</span>}
                 {task.SCHOOL_NAME && <span><strong>School:</strong> {task.SCHOOL_NAME}</span>}
                 {task.SUBSTITUTE_NAME && <span><strong>Substitute:</strong> {task.SUBSTITUTE_NAME}</span>}
