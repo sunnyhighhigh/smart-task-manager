@@ -123,7 +123,7 @@ function Dashboard({ token }) {
         </div>
         <button className="glass-button" style={{ width: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => {
           setEditingTaskId(null);
-          setFormData({ title: 'Para-Educator', description: '', category: 'Work', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '', substitute_name: '' });
+          setFormData({ title: 'Para-Educator', description: '', category: '', priority: 'Medium', status: 'Pending', due_date: '', school_district: '', school_name: '', start_time: '', stop_time: '', start_time_2: '', stop_time_2: '', substitute_name: '' });
           setIsModalOpen(true);
         }}>
           <PlusCircle size={20} /> Add Task
@@ -140,6 +140,7 @@ function Dashboard({ token }) {
                 {task.SCHOOL_DISTRICT && <span><strong>District:</strong> {task.SCHOOL_DISTRICT}</span>}
                 {task.SCHOOL_NAME && <span><strong>School:</strong> {task.SCHOOL_NAME}</span>}
                 {task.SUBSTITUTE_NAME && <span><strong>Substitute:</strong> {task.SUBSTITUTE_NAME}</span>}
+                {task.CATEGORY && <span><strong>Work Type:</strong> {task.CATEGORY}</span>}
                 {task.START_TIME && <span><strong>Morning Shift:</strong> {task.START_TIME} - {task.STOP_TIME}</span>}
                 {task.START_TIME_2 && <span><strong>Afternoon Shift:</strong> {task.START_TIME_2} - {task.STOP_TIME_2}</span>}
                 {(task.START_TIME || task.START_TIME_2) && <span><strong>Total Hours Worked:</strong> {calculateTotalHours(task.START_TIME, task.STOP_TIME, task.START_TIME_2, task.STOP_TIME_2) || '0h'}</span>}
@@ -187,9 +188,14 @@ function Dashboard({ token }) {
                 <input type="text" className="glass-input" value={formData.school_name} onChange={e => setFormData({...formData, school_name: e.target.value})} />
               </div>
               
-              <div style={{ gridColumn: 'span 2' }}>
+              <div>
                 <label>Substitute's Name</label>
                 <input type="text" className="glass-input" placeholder="e.g. John Doe" value={formData.substitute_name} onChange={e => setFormData({...formData, substitute_name: e.target.value})} />
+              </div>
+
+              <div>
+                <label>Work Type</label>
+                <input type="text" className="glass-input" placeholder="e.g. Para-Educator, SpEd" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
               </div>
 
               <div>
